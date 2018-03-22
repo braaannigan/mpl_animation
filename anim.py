@@ -163,7 +163,7 @@ def create_quad_object(z, x = None, y = None,
     anim_object = quad_object(z, x, y, titles, axkwargs, cb_label, kwargs)
     return [anim_object]
 
-def create_scatter_object(scatter_data,scatter_color = None, axkwargs = None,
+def create_scatter_object(scatter_data,*args,scatter_color = None, axkwargs = None,
 titles = None,  **kwargs):
     """Create an object for animating a scatter plot
     
@@ -173,10 +173,6 @@ titles = None,  **kwargs):
                     1) an array/list with N elements and sets
     axkwargs is a dictionary with keyword arguments for plot axis, e.g xlabel, or ylim
     **kwargs are keyword arguments for plt.scatter
-    
-    s : scalar or array_like, shape (n, ), optional
-        size in points^2.  Default is `rcParams['lines.markersize'] ** 2`.
-
     """
     if axkwargs:
          assert type(axkwargs) is dict, 'axkwargs must be a dictionary, but is {}'.format(type(axkwargs))
@@ -187,7 +183,7 @@ titles = None,  **kwargs):
 
     class scatter_object(object):
 
-        def __init__(self, scatter_data, scatter_color, titles, axkwargs, kwargs):
+        def __init__(self, scatter_data, args, scatter_color, titles, axkwargs, kwargs):
             self.__dict__.update({k: v for k, v in list(locals().items())
             if k != 'self'})
             self.t_len = scatter_data.shape[2]
@@ -200,7 +196,7 @@ titles = None,  **kwargs):
             elif not isinstance(scatter_color, (list, np.ndarray) ):
                 self.scatter_color = ['b' for i in np.arange(self.t_len)]
 
-    anim_object = scatter_object(scatter_data, scatter_color, titles, axkwargs, kwargs)
+    anim_object = scatter_object(scatter_data, args, scatter_color, titles, axkwargs, kwargs)
     return [anim_object]
 
 def create_contour_object(*args,**kwargs):
@@ -276,6 +272,7 @@ def animate(anim_objects, fps = 25, anim_save = None, bitrate = 1800,test=False,
                 t_len_list.append(obj.t_len)
     assert not np.any(np.array(t_len_list) - t_len_list[0]), 'time lengths are not the same'
     fig, axes = plt.subplots(**kwargs)
+    plt.tight_layout()
 
     class update_plot(object):
 

@@ -40,4 +40,4 @@ scat_obj = anim.create_scatter_object(scatter_data,point_size,
 anim_list = scat_obj
 # Create the animation - add the anim_save option to write to disk instead of showing in 
 # a window
-anim.animate(anim_list)#, anim_save = 'scatter.mp4')
+anim.animate(anim_list,figsize=(10,10), anim_save = 'scatter.mp4')
