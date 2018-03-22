@@ -3,5 +3,6 @@ A module to create animations in matplotlib using an intuitive declarative synta
 
 The examples sub-directory has examples to make line, pcolor and scatter plots.
 
-See
-![Alt Text](https://github.com/braaannigan/mpl_animation/blob/master/scatter.gif)
+See this for an example of what you can create
+
+![](https://github.com/braaannigan/mpl_animation/blob/master/scatter.gif)
