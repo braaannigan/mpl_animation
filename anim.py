@@ -272,7 +272,6 @@ def animate(anim_objects, fps = 25, anim_save = None, bitrate = 1800,test=False,
                 t_len_list.append(obj.t_len)
     assert not np.any(np.array(t_len_list) - t_len_list[0]), 'time lengths are not the same'
     fig, axes = plt.subplots(**kwargs)
-    plt.tight_layout()
 
     class update_plot(object):
 
