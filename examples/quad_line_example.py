@@ -2,9 +2,9 @@ import anim
 import numpy as np
 
 # x-axis of plot
-x = np.arange(0,2*np.pi,1e-1)
+x = np.arange(0,2*np.pi,5e-1)
 # y-axis of plot
-y = np.arange(0,2*np.pi,1e-1)
+y = np.arange(0,2*np.pi,5e-1)
 # time-axis of plot
 t = np.arange(0,2*np.pi,1e-1)
 # Don't need meshgrid in anim.create_quad_object, 
@@ -27,7 +27,7 @@ quad_axkwargs = {'xlabel':'x','ylabel':'y'}
 line_axkwargs = {'xlabel':'x','ylabel':'Merid. Mean'}
 
 # Create the animation objects
-cos_quad = anim.create_quad_object(cos_wave,x=x,y=y,clims=[-2,2],
+cos_quad = anim.create_quad_object(x,y,cos_wave,vmin = -5,clims=[-2,2],
                                    titles = quad_titles,
                                    axkwargs = quad_axkwargs,
                                    cb_label='Energy'
@@ -42,4 +42,4 @@ mean_line = anim.create_line_object(Y[:,0,:],meridional_mean ,'r',
 anim_list = cos_quad + mean_line
 
 # Animate the objects
-anim.animate(anim_list, figsize=(10,7),anim_save='quad_line.mp4')
+anim.animate(anim_list)#, figsize=(10,7),anim_save='quad_line.mp4')

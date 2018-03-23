@@ -27,12 +27,11 @@ def standard_line_tests(line_obj):
 def test_create_line_object():
     """Test line object with no extra arguments"""
     x,t,X,T,s = set_line_plot_data()
-    line_obj = anim.create_line_object(X, s)[0]
+    line_obj = anim.create_line_object(x, s)[0]
     standard_line_tests(line_obj)
     assert_array_equal(np.arange(line_obj.t_len),line_obj.titles)
     assert line_obj.xlim == (X.min(),X.max())
     assert line_obj.ylim == (s.min(),s.max())
-    assert line_obj.args == ()
     assert line_obj.kwargs == {}
     assert list(line_obj.axkwargs) == ['xlim','ylim']
     assert line_obj.axkwargs['xlim'] == line_obj.xlim
@@ -48,12 +47,11 @@ def test_create_line_object_axkwargs():
     x,t,X,T,s = set_line_plot_data()
     axkwargs = {'xlim':tuple(xlim),'ylim':tuple(ylim),
                  'xlabel':xlabel,'ylabel':ylabel}
-    line_obj = anim.create_line_object(X, s,axkwargs=axkwargs)[0]
+    line_obj = anim.create_line_object(x, s,axkwargs=axkwargs)[0]
     standard_line_tests(line_obj)
     assert_array_equal(np.arange(line_obj.t_len),line_obj.titles)
     assert line_obj.xlim == tuple(xlim)
     assert line_obj.ylim == tuple(ylim)
-    assert line_obj.args == ()
     assert line_obj.kwargs == {}
     assert list(line_obj.axkwargs) == ['xlim','ylim','xlabel','ylabel']
 
@@ -61,12 +59,11 @@ def test_create_line_object_titles():
     """Test line object with specified titles"""
     x,t,X,T,s = set_line_plot_data()
     titles = ['data at time {}'.format(i) for i in np.arange(len(t))]
-    line_obj = anim.create_line_object(X, s, titles = titles)[0]
+    line_obj = anim.create_line_object(x, s, titles = titles)[0]
     standard_line_tests(line_obj)
     assert titles == line_obj.titles
     assert line_obj.xlim == (X.min(),X.max())
     assert line_obj.ylim == (s.min(),s.max())
-    assert line_obj.args == ()
     assert line_obj.kwargs == {}
     assert list(line_obj.axkwargs) == ['xlim','ylim']
     assert line_obj.axkwargs['xlim'] == line_obj.xlim
@@ -88,17 +85,16 @@ def standard_quad_tests(quad_obj):
     x,y,t,X,Y,T,s = set_quad_plot_data()
     assert_array_equal(x,quad_obj.x)
     assert_array_equal(y,quad_obj.y)
-    assert_array_equal(s,quad_obj.z)
+    assert_array_equal(s,quad_obj.C)
     assert quad_obj.t_len == len(t)
     assert quad_obj.plot_type == 'quad'
 
 def test_create_quad_object():
     """Test quad object with no extra arguments"""
     x,y,t,X,Y,T,s = set_quad_plot_data()
-    quad_obj = anim.create_quad_object(s,x=x,y=y)[0]
+    quad_obj = anim.create_quad_object(x,y,s)[0]
     standard_quad_tests(quad_obj)
     assert_array_equal(np.arange(quad_obj.t_len),quad_obj.titles)
-    assert quad_obj.args == ()
     assert list(quad_obj.kwargs) == ['vmin', 'vmax', 'cmap']
     assert list(quad_obj.axkwargs) == ['xlim','ylim']
     assert quad_obj.axkwargs['xlim'] == (X.min(),X.max())
@@ -113,21 +109,19 @@ def test_create_quad_object_axkwargs():
                  'xlabel':xlabel,'ylabel':ylabel}
     x,y,t,X,Y,T,s = set_quad_plot_data()
     titles = ['data at time {}'.format(i) for i in np.arange(len(t))]
-    quad_obj = anim.create_quad_object(s,x=x,y=y,axkwargs=axkwargs,titles=titles)[0]
+    quad_obj = anim.create_quad_object(x,y,s,axkwargs=axkwargs,titles=titles)[0]
     standard_quad_tests(quad_obj)
     assert titles == quad_obj.titles
-    assert quad_obj.args == ()
     assert list(quad_obj.kwargs) == ['vmin', 'vmax', 'cmap']
     assert list(quad_obj.axkwargs) == ['xlim','ylim','xlabel','ylabel']
 
 def test_create_quad_object_clims_cblabel():
     clims = [0,1]
     x,y,t,X,Y,T,s = set_quad_plot_data()
-    quad_obj = anim.create_quad_object(s,x=x,y=y,clims=clims,cb_label='aaa')[0]
+    quad_obj = anim.create_quad_object(x,y,s,clims=clims,cb_label='aaa')[0]
     standard_quad_tests(quad_obj)
     assert quad_obj.kwargs['vmin'] == clims[0]
     assert quad_obj.kwargs['vmax'] == clims[1]
-    assert quad_obj.args == ()
     assert quad_obj.cb_label == 'aaa'
     assert list(quad_obj.kwargs) == ['vmin', 'vmax', 'cmap']
 
@@ -139,19 +133,19 @@ def set_scatter_plot_data():
             scatter_data[:,:,i-1] +
             np.random.multivariate_normal([0,0],[[1,0.5],[0.5,1]],size=10)
         )
-    return scatter_data
+    return scatter_data[:,0,:],scatter_data[:,1,:]
 
 def standard_scatter_tests(scatter_obj):
-    scatter_data = set_scatter_plot_data()
-    assert_array_equal(scatter_data,scatter_obj.scatter_data)
+    x,y = set_scatter_plot_data()
+    assert_array_equal(x,scatter_obj.x)
+    assert_array_equal(y,scatter_obj.y)
     assert scatter_obj.t_len == 30
     assert scatter_obj.plot_type == 'scat'
 
 def test_create_scatter_object():
     """Test scatter object with no extra arguments"""
-    scatter_data = set_scatter_plot_data()
+    x,y = set_scatter_plot_data()
     axkwargs={'xlim':(-5e-1,5e-1),'ylim':(-5e-1,5e-1)}
-    scatter_obj = anim.create_scatter_object(scatter_data,axkwargs=axkwargs)[0]
+    scatter_obj = anim.create_scatter_object(x,y,axkwargs=axkwargs)[0]
     standard_scatter_tests(scatter_obj)
     assert_array_equal(np.arange(scatter_obj.t_len),scatter_obj.titles)
-    assert scatter_obj.args == ()

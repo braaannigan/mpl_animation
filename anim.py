@@ -23,15 +23,20 @@ def set_titles(titles, t_len):
         titles = np.arange(t_len)
     return titles
 
-def create_line_object(x, y, *args, axkwargs = None, titles = None,**kwargs):
+def create_line_object(*args, axkwargs = None, titles = None,**kwargs):
     """Create object for animating a line plot.
     
     Inputs:
+    Call signatures
+    create_line_object(x, y)        # plot x and y using default line style and color
+    create_line_object(x, y, 'bo')  # plot x and y using blue circle markers
+    create_line_object(y)           # plot y using x as index array 0..N-1
+    create_line_object(y, 'r+')     # ditto, but with red plusses
+
     x is x-axis data, shape = (N, time_length) or (N,)
     y is y-axis data, shape = (N, time_length) or (N,)
     One of x or y has to be two-dimensional!
     
-    *args is any positional argument to plot.plot() e.g. '--r'
     axkwargs is a dictionary with keyword arguments for plot axis, e.g xlabel, or ylim
     titles is a list of frame titles - see set_titles function above
     **kwargs are the keyword arguments to plot.plot() e.g. label = 'data' or lw =2
@@ -41,9 +46,22 @@ def create_line_object(x, y, *args, axkwargs = None, titles = None,**kwargs):
     """
     if axkwargs:
          assert type(axkwargs) is dict, 'axkwargs must be a dictionary, but is {}'.format(type(axkwargs))
-    assert len(y.shape) < 3, "y has shape {}, should be two dimensional".format(y.shape)
-    assert len(x.shape) < 3, "x has shape {}, should be two dimensional".format(x.shape)
+    if len(args) == 1:
+        y = args[0]
+        x = np.arange(len(y))
+        line_style = ''
+    elif len(args) == 2 and isinstance(args[1],np.ndarray):
+        x,y = args
+        line_style = ''
+    elif len(args) == 2 and isinstance(args[1],'str'):
+        y,line_style = args
+        x = np.arange(len(y))
+    elif len(args) == 3:
+        x,y,line_style = args
+
+    assert max((len(x.shape),len(y.shape))) < 3, "x has shape {} and y has shape {}, but neither should have more than two dimensions".format(x.shape,y.shape)
     assert len(x.shape) ==2 or len(y.shape) ==2,"""One of x or y must be 2D but x has shape {} and y has shape {}""".format(x.shape,y.shape)
+    assert isinstance(line_style,str),"Line style must be a string but has type {}".format(type(line_style))
     if axkwargs:
         # If the xlim or ylim is not specified
         if 'xlim' not in axkwargs:
@@ -58,7 +76,7 @@ def create_line_object(x, y, *args, axkwargs = None, titles = None,**kwargs):
     class line_object(object):
         """Create the line_object for the animation"""
 
-        def __init__(self,x, y, args, axkwargs, titles, kwargs):
+        def __init__(self,x, y, line_style, axkwargs, titles, kwargs):
             self.__dict__.update({k: v for k, v in list(locals().items())
             if k != 'self'})
             self.kwargs = kwargs
@@ -76,11 +94,10 @@ def create_line_object(x, y, *args, axkwargs = None, titles = None,**kwargs):
             self.t_len = self.y.shape[-1] #T length
             self.titles = set_titles(titles, self.t_len)
     # Create the animation object
-    anim_object = line_object( x, y, args, axkwargs, titles, kwargs)
+    anim_object = line_object(x,y,line_style, axkwargs, titles, kwargs)
     return [anim_object]
 
-
-def create_quad_object(z, x = None, y = None, 
+def create_quad_object(*args, 
                        clims = [], cmap = plt.cm.RdBu_r,
                        titles = None,
                        cmap_bad = None, cb_label = None, 
@@ -88,10 +105,13 @@ def create_quad_object(z, x = None, y = None,
     """Create an object for animating a pcolormesh plot
     
     Inputs:
-    
-    z is the color field, a np.ndarray with shape (ylen, xlen, tlen)
+    Call signatures:
+        create_quad_object(C)
+        create_quad_object(x, y, C)   
+    C is the color field, a np.ndarray with shape (ylen, xlen, tlen)
     x is the x axis, a np.ndarray with shape (xlen) or shape (ylen, xlen)
     y is the y axis, a np.ndarray with shape (ylen) or shape (ylen, xlen)
+    
     clims is a two element list with the colourbar limits
     titles is a list of frame titles - see set_titles function above
     cmap_bad sets out how to colour regions outside the colour limits
@@ -100,45 +120,46 @@ def create_quad_object(z, x = None, y = None,
     **kwargs are keyword arguments for pcolormesh
     """
     if axkwargs:
-         assert type(axkwargs) is dict, 'axkwargs must be a dictionary, but is {}'.format(type(axkwargs))
+        assert type(axkwargs) is dict, 'axkwargs must be a dictionary, but is {}'.format(type(axkwargs))
     if cb_label:
          assert type(cb_label) is str, 'cb_label must be a string, but is {}'.format(type(cb_label))
-    #Test for the right shapes
-    if len(z.shape) > 3:
-        z = np.squeeze(z)
-        assert len(z.shape) == 3, "z does is not 3-dimensional, even with squeezing"
-    # If x and y not specified, set an integer range for them
-    if not isinstance(x, np.ndarray):
-        x = np.arange(z.shape[1])
-    if not isinstance(y, np.ndarray):
-        y = np.arange(z.shape[0])
-    # Remove possible singleton dimensions
-    x = np.squeeze(x)
-    y = np.squeeze(y)
-    # Check that all the input arrays are the right shape
-    assert len(x.shape) == len(y.shape),\
-     "Axis arrays need to have same number of dimensions, but x.shape = {} and y.shape = {}".format(x.shape,y.shape)
-    if len(x.shape) > 1: # Check that x and y are the same shape for 2d axes
-        assert x.shape == y.shape,\
-        "Axis arrays need to have same shape, but x.shape = {} and y.shape = {}".format(x.shape,y.shape)
-        assert x.shape == z.shape[:2],\
-        "Axis arrays need to have same shape, but x.shape = {} and z.shape = {}".format(x.shape,z.shape)
+    assert 'vmin' not in kwargs and 'vmax' not in kwargs, "Specify color limits as a two element list with clims = [,] instead of with vmin and vmax"
+
+    #Test for the right number of input arrays in *args
+    assert len(args) == 1 or len(args) == 3,'args can have length 1 or 3 but has length {}'.format(len(args))
+    C = args[-1]
+    if len(C.shape) > 3:
+        C = np.squeeze(C)
+        assert len(C.shape) == 3, "C does is not 3-dimensional, even with squeezing"
+    if len(args) == 1:
+        x = np.arange(C.shape[1])
+        y = np.arange(C.shape[0])
     else:
-        assert len(y) == z.shape[0],\
-        "First z axis and y need to have the same shape, but z.shape = {} and y.shape = {}".format(z.shape,y.shape)
-        assert len(x) == z.shape[1],\
-        "First z axis and x need to have the same shape, but z.shape = {} and y.shape = {}".format(z.shape,y.shape)
+        x,y = args[:2]
+        # Remove possible singleton dimensions
+        x = np.squeeze(x)
+        y = np.squeeze(y)
+        if len(x.shape) > 1: 
+            # If x and y are 2d coordinate arrays
+            assert x.shape == y.shape,\
+            "Axis arrays need to have same shape, but x.shape = {} and y.shape = {}".format(x.shape,y.shape)
+            assert x.shape == C.shape[:2],\
+            "Axis arrays need to have same shape, but x.shape = {} and C.shape = {}".format(x.shape,z.shape)
+        else: 
+            #If x and y are 1d coordinate arrays
+            assert (len(y),len(x)) == C.shape[:2],\
+        "C has shape {}, but y has shape {} and x has shape {}".format(C.shape,len(y),len(x))         
 
     if not clims:
-        kwargs['vmin'] = z.min()
-        kwargs['vmax'] = z.max()
+        kwargs['vmin'] = C.min()
+        kwargs['vmax'] = C.max()
     else:
         kwargs['vmin'] = clims[0]
         kwargs['vmax'] = clims[1]
     
     # Copy the matplotlib colormap to allow NaN values to be masked
     kwargs['cmap'] = copy(cmap)
-    z = np.ma.array(z, mask=np.isnan(z))
+    C = np.ma.array(C, mask=np.isnan(C))
 
     if not cmap_bad:
         kwargs['cmap'].set_bad('gray',1.)
@@ -153,22 +174,23 @@ def create_quad_object(z, x = None, y = None,
         axkwargs = {'xlim':(x.min(), x.max()),'ylim':(y.min(), y.max())}
     class quad_object(object):
 
-        def __init__(self, z, args, x, y, titles, axkwargs, cb_label, kwargs):
+        def __init__(self, C, x, y, titles, axkwargs, cb_label, kwargs):
             self.__dict__.update({k: v for k, v in list(locals().items())
             if k != 'self'})
             self.plot_type = 'quad'
-            self.t_len = z.shape[-1]
+            self.t_len = C.shape[-1]
             self.titles = set_titles(titles, self.t_len)
 
-    anim_object = quad_object(z, x, y, titles, axkwargs, cb_label, kwargs)
+    anim_object = quad_object(C, x, y, titles, axkwargs, cb_label, kwargs)
     return [anim_object]
 
-def create_scatter_object(scatter_data,*args,scatter_color = None, axkwargs = None,
+def create_scatter_object(x,y,scatter_color = None, axkwargs = None,
 titles = None,  **kwargs):
     """Create an object for animating a scatter plot
     
     Inputs:
-    scatter_data - np.ndarray with shape (N, 2, time_length), where N is the number of samples.
+    x - np.ndarray with shape (N, time_length), where N is the number of samples.
+    y - np.ndarray with shape (N, time_length), where N is the number of samples.
     scatter_color - can be:
                     1) an array/list with N elements and sets
     axkwargs is a dictionary with keyword arguments for plot axis, e.g xlabel, or ylim
@@ -176,27 +198,35 @@ titles = None,  **kwargs):
     """
     if axkwargs:
          assert type(axkwargs) is dict, 'axkwargs must be a dictionary, but is {}'.format(type(axkwargs))
-    if len(scatter_data.shape) == 1:
-        scatter_data = scatter_data[:,np.newaxis,np.newaxis]
+    assert x.shape == y.shape, "x and y need to be the same shape but x has shape {} and y has shape {}".format(x.shape,y.shape)
+    assert len(x.shape) == 2, "x and y need to be 2 dimensional but are shape {}".format(x.shape)
+    # We need the colour argument to be an array/list that is the same length as
+    # the time axis to allow colours to change in time. If the colour is a constant in time
+    # sting for all points then we turn it into a list.
+    if 'c' in kwargs:
+        if isinstance(kwargs['c'], (str)):
+            scatter_color = [kwargs['c'] for i in range(x.shape[1])]
+        if isinstance(kwargs['c'],list):
+            scatter_color = kwargs['c']
+            assert len(kwargs['c']) == x.shape[1],"List must be same length as time axis"
+        if isinstance(kwargs['c'],np.ndarray):
+            scatter_color = [kwargs['c'][:,i] for i in range(x.shape[1])]
+            print(len(scatter_color),scatter_color[0].shape)
+        kwargs.pop('c')
     else:
-        scatter_data = scatter_data
-
+        scatter_color = ['b' for i in range(x.shape[1])]
     class scatter_object(object):
 
-        def __init__(self, scatter_data, args, scatter_color, titles, axkwargs, kwargs):
+        def __init__(self, x, y, scatter_color, titles, axkwargs, kwargs):
             self.__dict__.update({k: v for k, v in list(locals().items())
             if k != 'self'})
-            self.t_len = scatter_data.shape[2]
+            self.t_len = x.shape[1]
             self.plot_type = 'scat'
-            self.xlim = (self.scatter_data[:,0,:].min(), self.scatter_data[:,0,:].max())
-            self.ylim = (self.scatter_data[:,1,:].min(), self.scatter_data[:,1,:].max())
+            self.xlim = (self.x.min(), self.x.max())
+            self.ylim = (self.y.min(), self.y.max())
             self.titles = set_titles(titles, self.t_len)
-            if isinstance(scatter_color, (str)):
-                self.scatter_color = [scatter_color for i in range(self.t_len)]
-            elif not isinstance(scatter_color, (list, np.ndarray) ):
-                self.scatter_color = ['b' for i in np.arange(self.t_len)]
 
-    anim_object = scatter_object(scatter_data, args, scatter_color, titles, axkwargs, kwargs)
+    anim_object = scatter_object(x, y, scatter_color, titles, axkwargs, kwargs)
     return [anim_object]
 
 def create_contour_object(*args,**kwargs):
@@ -292,19 +322,17 @@ def animate(anim_objects, fps = 25, anim_save = None, bitrate = 1800,test=False,
                     self.plot_types[idx].append(obj.plot_type)#Has same indexing as self.plot_objects
                     if obj.plot_type == 'quad':
                         self.plot_objects[idx].append(
-                        ax.pcolormesh(obj.x, obj.y, obj.z[:,:,0],*obj.args, **obj.kwargs) )
+                        ax.pcolormesh(obj.x, obj.y, obj.C[:,:,0], **obj.kwargs) )
                         cb = plt.colorbar(self.plot_objects[idx][odx], ax = ax)
                         if hasattr(obj, 'cb_label'):
                             cb.set_label(obj.cb_label)
                     elif obj.plot_type == 'scat':
                         self.plot_objects[idx].append(
                         ax.scatter(
-                        obj.scatter_data[0,:,0],obj.scatter_data[1,:,0],*obj.args,c = obj.scatter_color[0],  **obj.kwargs) )
-                        #ax.set_xlim(obj.xlim)
-                        #ax.set_ylim(obj.ylim)
+                        obj.x[:,0],obj.y[:,0],c = obj.scatter_color[0],**obj.kwargs) )  
                     elif obj.plot_type == 'line':
                         self.plot_objects[idx].append(
-                        ax.plot(obj.x[:,0], obj.y[:,0], *obj.args, **obj.kwargs)[0] )
+                        ax.plot(obj.x[:,0], obj.y[:,0], obj.line_style, **obj.kwargs)[0] )
                         if 'label' in obj.kwargs:
                             ax.legend()
                     elif obj.plot_type == 'contour':
@@ -332,9 +360,9 @@ def animate(anim_objects, fps = 25, anim_save = None, bitrate = 1800,test=False,
                 for odx,obj in enumerate(self.plot_objects[idx]):
                     if self.plot_types[idx][odx] != 'contour':
                         if self.plot_types[idx][odx] == 'quad':
-                            obj.set_array(self.anim_objects[idx][odx].z[:-1,:-1, i].ravel())
+                            obj.set_array(self.anim_objects[idx][odx].C[:-1,:-1, i].ravel())
                         elif self.plot_types[idx][odx] == 'scat':
-                            obj.set_offsets(self.anim_objects[idx][odx].scatter_data[:,:,i])
+                            obj.set_offsets(np.array((self.anim_objects[idx][odx].x[:,i],self.anim_objects[idx][odx].y[:,i])).T)
                             obj.set_color(self.anim_objects[idx][odx].scatter_color[i])
                         elif self.plot_types[idx][odx] == 'line':
                             obj.set_data(self.anim_objects[idx][odx].x[:,i],
