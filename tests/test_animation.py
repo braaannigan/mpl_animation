@@ -24,10 +24,10 @@ def standard_line_tests(line_obj):
     assert line_obj.t_len == len(t)
     assert line_obj.plot_type == 'line'
 
-def test_create_line_object():
+def test_plot():
     """Test line object with no extra arguments"""
     x,t,X,T,s = set_line_plot_data()
-    line_obj = anim.create_line_object(x, s)[0]
+    line_obj = anim.plot(x, s)[0]
     standard_line_tests(line_obj)
     assert_array_equal(np.arange(line_obj.t_len),line_obj.titles)
     assert line_obj.xlim == (X.min(),X.max())
@@ -47,7 +47,7 @@ def test_create_line_object_axkwargs():
     x,t,X,T,s = set_line_plot_data()
     axkwargs = {'xlim':tuple(xlim),'ylim':tuple(ylim),
                  'xlabel':xlabel,'ylabel':ylabel}
-    line_obj = anim.create_line_object(x, s,axkwargs=axkwargs)[0]
+    line_obj = anim.plot(x, s,axkwargs=axkwargs)[0]
     standard_line_tests(line_obj)
     assert_array_equal(np.arange(line_obj.t_len),line_obj.titles)
     assert line_obj.xlim == tuple(xlim)
@@ -59,7 +59,7 @@ def test_create_line_object_titles():
     """Test line object with specified titles"""
     x,t,X,T,s = set_line_plot_data()
     titles = ['data at time {}'.format(i) for i in np.arange(len(t))]
-    line_obj = anim.create_line_object(x, s, titles = titles)[0]
+    line_obj = anim.plot(x, s, titles = titles)[0]
     standard_line_tests(line_obj)
     assert titles == line_obj.titles
     assert line_obj.xlim == (X.min(),X.max())
@@ -92,7 +92,7 @@ def standard_quad_tests(quad_obj):
 def test_create_quad_object():
     """Test quad object with no extra arguments"""
     x,y,t,X,Y,T,s = set_quad_plot_data()
-    quad_obj = anim.create_quad_object(x,y,s)[0]
+    quad_obj = anim.pcolormesh(x,y,s)[0]
     standard_quad_tests(quad_obj)
     assert_array_equal(np.arange(quad_obj.t_len),quad_obj.titles)
     assert list(quad_obj.kwargs) == ['vmin', 'vmax', 'cmap']
@@ -109,7 +109,7 @@ def test_create_quad_object_axkwargs():
                  'xlabel':xlabel,'ylabel':ylabel}
     x,y,t,X,Y,T,s = set_quad_plot_data()
     titles = ['data at time {}'.format(i) for i in np.arange(len(t))]
-    quad_obj = anim.create_quad_object(x,y,s,axkwargs=axkwargs,titles=titles)[0]
+    quad_obj = anim.pcolormesh(x,y,s,axkwargs=axkwargs,titles=titles)[0]
     standard_quad_tests(quad_obj)
     assert titles == quad_obj.titles
     assert list(quad_obj.kwargs) == ['vmin', 'vmax', 'cmap']
@@ -118,7 +118,7 @@ def test_create_quad_object_axkwargs():
 def test_create_quad_object_clims_cblabel():
     clims = [0,1]
     x,y,t,X,Y,T,s = set_quad_plot_data()
-    quad_obj = anim.create_quad_object(x,y,s,clims=clims,cb_label='aaa')[0]
+    quad_obj = anim.pcolormesh(x,y,s,clims=clims,cb_label='aaa')[0]
     standard_quad_tests(quad_obj)
     assert quad_obj.kwargs['vmin'] == clims[0]
     assert quad_obj.kwargs['vmax'] == clims[1]
@@ -146,6 +146,6 @@ def test_create_scatter_object():
     """Test scatter object with no extra arguments"""
     x,y = set_scatter_plot_data()
     axkwargs={'xlim':(-5e-1,5e-1),'ylim':(-5e-1,5e-1)}
-    scatter_obj = anim.create_scatter_object(x,y,axkwargs=axkwargs)[0]
+    scatter_obj = anim.scatter(x,y,axkwargs=axkwargs)[0]
     standard_scatter_tests(scatter_obj)
     assert_array_equal(np.arange(scatter_obj.t_len),scatter_obj.titles)

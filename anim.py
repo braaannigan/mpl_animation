@@ -23,7 +23,7 @@ def set_titles(titles, t_len):
         titles = np.arange(t_len)
     return titles
 
-def create_line_object(*args, axkwargs = None, titles = None,**kwargs):
+def plot(*args, axkwargs = None, titles = None,**kwargs):
     """Create object for animating a line plot.
     
     Inputs:
@@ -97,7 +97,7 @@ def create_line_object(*args, axkwargs = None, titles = None,**kwargs):
     anim_object = line_object(x,y,line_style, axkwargs, titles, kwargs)
     return [anim_object]
 
-def create_quad_object(*args, 
+def pcolormesh(*args, 
                        clims = [], cmap = plt.cm.RdBu_r,
                        titles = None,
                        cmap_bad = None, cb_label = None, 
@@ -184,7 +184,7 @@ def create_quad_object(*args,
     anim_object = quad_object(C, x, y, titles, axkwargs, cb_label, kwargs)
     return [anim_object]
 
-def create_scatter_object(x,y,scatter_color = None, axkwargs = None,
+def scatter(x,y,scatter_color = None, axkwargs = None,
 titles = None,  **kwargs):
     """Create an object for animating a scatter plot
     
@@ -229,7 +229,7 @@ titles = None,  **kwargs):
     anim_object = scatter_object(x, y, scatter_color, titles, axkwargs, kwargs)
     return [anim_object]
 
-def create_contour_object(*args,**kwargs):
+def contour(*args,**kwargs):
     """Create an object that can be passed to the animation routine
     z is the color field with shape (ylen, xlen, tlen)
     x is the x axis with shape (xlen) or shape (ylen, xlen)

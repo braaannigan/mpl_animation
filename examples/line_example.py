@@ -17,8 +17,8 @@ sin_wave = (t/t.max())*np.sin(X - T)
 # Create a title
 titles = ['Wave at time {:.02f}'.format(i) for i in t]
 # Create the animation objects
-cos_line = anim.create_line_object(x, cos_wave, titles = titles)
-sin_line = anim.create_line_object(x, sin_wave,'r', titles = titles)
+cos_line = anim.plot(x, cos_wave, titles = titles)
+sin_line = anim.plot(x, sin_wave,'r', titles = titles)
 
 # Concatenate the objects
 anim_list = cos_line + sin_line
