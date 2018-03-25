@@ -25,7 +25,6 @@ git clone https://github.com/braaannigan/mpl_animation
 ```
 python examples line_example.py
 ```
-4. Otherwise you need to add the mpl_animation directory to somewhere on your pythonpath.
 
 ## Quick start
 To see the module in action quickly:
@@ -38,15 +37,16 @@ x = np.arange(0,2*np.pi,1e-1)
 # time-axis of plot
 t = np.arange(0,8*np.pi,1e-1)
 
-# Use meshgrid to help create the data to be plotted - but
-# can also give 1D coordinate arrays to create_line_object
+# Use meshgrid to create the data to be plotted
+# (anim.plot can also accept 1D coordinate arrays)
 T,X = np.meshgrid(t,x)
-# Propagating cosine wave
+
+# Create data - a propagating cosine wave
 cos_wave = (t/t.max())*np.cos(X - T)
 
-# Create a title
+# Create a title for each frame
 titles = ['Wave at time {:.02f}'.format(i) for i in t]
-# Create the animation object
+# Create the plot object
 cos_line = anim.plot(x, cos_wave, titles = titles)
 
 # Animate the object
