@@ -1,4 +1,4 @@
-import anim
+import mpl_animation.anim as anim
 import numpy as np
 
 # Create the coordinate arrays

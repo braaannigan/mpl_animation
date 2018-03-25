@@ -1,4 +1,4 @@
-import anim
+import mpl_animation.anim as anim
 import numpy as np
 from numpy.testing import assert_array_equal
 

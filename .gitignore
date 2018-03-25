@@ -1,0 +1,14 @@
+# Compiled python modules.
+*.pyc
+
+# Setuptools distribution folder.
+/dist/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+
+# Movie files
+mpl_animation/examples/*mp4
+
+# pycache
+__pycache__/*

@@ -12,4 +12,11 @@ setup(name='mpl_animation',
       license='MIT',
       packages=['mpl_animation'],
       install_requires=['numpy','matplotlib'],
+      classifiers = [
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Development Status :: 3 - Alpha",
+        "License :: OSI Approved :: MIT License",
+        "Topic :: Scientific/Engineering :: Visualization"
+                    ],
       zip_safe=False)

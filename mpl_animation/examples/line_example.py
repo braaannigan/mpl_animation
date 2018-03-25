@@ -1,4 +1,4 @@
-import anim
+import mpl_animation.anim as anim
 import numpy as np
 
 # x-axis of plot
