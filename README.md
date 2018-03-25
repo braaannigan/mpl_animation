@@ -6,7 +6,7 @@ This is an example of what you can create with a few lines of code.
 ![](https://github.com/braaannigan/mpl_animation/blob/master/scatter.gif)
 
 
-The examples sub-directory shows how to make line, pcolor and scatter plots. 
+The examples sub-directory shows how to make line, pcolor and scatter plots.  There's a quick start example of a line plot below. 
 https://github.com/braaannigan/mpl_animation/tree/master/mpl_animation/examples
 
 
