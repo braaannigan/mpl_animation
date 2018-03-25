@@ -28,7 +28,7 @@ python examples line_example.py
 ```
 
 ## Quick start
-To see the module in action quickly:
+To see the module in action:
 ```python
 import mpl_animation.anim as anim
 import numpy as np
