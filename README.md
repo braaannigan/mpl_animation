@@ -59,4 +59,6 @@ the anim.animate() function.  In this case the movie will not be shown on the sc
 ```
 conda install -c menpo ffmpeg
 ```
+## Is there a way to stop the title being partially cut off?
+I hope so!  All of the solutions I've found to this require modifying the rcparams, let me know if you have a way of doing so within the plotting routine.
 
