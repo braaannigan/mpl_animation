@@ -1,6 +1,7 @@
 # mpl_animation
-A module to create animations in matplotlib using an intuitive declarative syntax.  Contributions welcome!
-See this for an example of what you can create
+A module to create line, color and scatter animations in matplotlib using an intuitive declarative syntax.  Contributions/suggestions are welcome!
+
+This is an example of what you can create with a few lines of code.
 
 ![](https://github.com/braaannigan/mpl_animation/blob/master/scatter.gif)
 
