@@ -25,7 +25,7 @@ for i in range(len(t)):
     else:
         scatter_color.append('b')
 # Create the titles list that specifies the time
-titles = ['Time {:.02f}'.format(i) for i in t]
+titles = ['' for i in t]
 # Specify the size of the scatter points
 point_size = 5*np.arange(len(t))
 # Axis keyword arguments
@@ -33,12 +33,11 @@ axkwargs = {'xlim':(-1.1,1.1),'ylim':(-1.1,1.1),
             'xlabel':'X','ylabel':'Y'}
 
 # Create the single-element list with the scatter object
-scat_obj = anim.scatter(x,y,s=point_size, 
-                                      axkwargs = axkwargs,c=scatter_color,
-                                      titles = titles)
+scat_obj = anim.scatter(x,y,s=point_size, titles = titles,
+                                      axkwargs = axkwargs,c=scatter_color)
 
 # This step isn't interesting here because there's only one subplot
 anim_list = scat_obj
 # Create the animation with 10 frames per second - add the anim_save option to write to disk instead of showing in 
 # a window
-anim.animate(anim_list,figsize=(8,6),fps = 10)#, anim_save = 'scatter.mp4')
+anim.animate(anim_list,figsize=(8,6),fps = 10, anim_save = 'scatter.mp4')

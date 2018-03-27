@@ -27,6 +27,8 @@ git clone https://github.com/braaannigan/mpl_animation
 python examples line_example.py
 ```
 
+**The module is Python3 only**.  The reason for this is that Python3 has a better syntax for including default and optional arguments and keyword arguments to functions.  Re-factoring to allow Python2 would mean breaking the link with the underlying matplotlib args and kwargs function call.
+
 ## Quick start
 To see the module in action:
 ```python
@@ -60,6 +62,13 @@ the anim.animate() function.  In this case the movie will not be shown on the sc
 ```
 conda install -c menpo ffmpeg
 ```
+
+## Can you animate contour plots?
+You can't animate contour plots at the moment. I don't think there is an equivalent matplotlib plotting method for contour plots i.e. there is no equivalent method to ```set_data()``` for line plots or ```set_array()``` for pcolormesh plots.  
+
+## Can you overlay plots in a single subplot
+This is a target for a future version.
+
 ## Is there a way to stop the title being partially cut off?
 I hope so!  All of the solutions I've found to this require modifying the rcparams, let me know if you have a way of doing so within the plotting routine.
 

@@ -23,7 +23,7 @@ def set_titles(titles, t_len):
         titles = np.arange(t_len)
     return titles
 
-def plot(*args, axkwargs = None, titles = None,**kwargs):
+def plot(*args, axkwargs = None, titles = None, **kwargs):
     """Create object for animating a line plot.
     
     Inputs:
@@ -229,31 +229,6 @@ titles = None,  **kwargs):
     anim_object = scatter_object(x, y, scatter_color, titles, axkwargs, kwargs)
     return [anim_object]
 
-def contour(*args,**kwargs):
-    """Create an object that can be passed to the animation routine
-    z is the color field with shape (ylen, xlen, tlen)
-    x is the x axis with shape (xlen) or shape (ylen, xlen)
-    y is the y axis with shape (ylen) or shape (ylen, xlen)
-    clims is a two element list with the colour limits
-    titles is a list with titles for each frame
-    cmap_bad sets out how to colour regions outside the colour limits
-    axkwargs is a dictionary with keyword arguments for plot axis, e.g xlabel, or ylim
-    *args are positional arguments for pcolormesh
-    **kwargs are keyword arguments for pcolormesh
-    """
-
-    class cont_object(object):
-
-        def __init__(self, args, kwargs):
-            self.__dict__.update({k: v for k, v in list(locals().items())
-            if k != 'self'})
-            self.plot_type = 'contour'
-            self.t_len = None
-
-    anim_object = cont_object(args, kwargs)
-    return [anim_object]
-
-
 def animate(anim_objects, fps = 25, anim_save = None, bitrate = 1800,test=False, **kwargs):
     """Main animation routine
     Inputs:
@@ -335,9 +310,6 @@ def animate(anim_objects, fps = 25, anim_save = None, bitrate = 1800,test=False,
                         ax.plot(obj.x[:,0], obj.y[:,0], obj.line_style, **obj.kwargs)[0] )
                         if 'label' in obj.kwargs:
                             ax.legend()
-                    elif obj.plot_type == 'contour':
-                        self.plot_objects[idx].append(
-                        ax.contour(*obj.args, **obj.kwargs) )
                 if obj.plot_type != 'contour':
                     if obj.axkwargs:
                         ax.set(**obj.axkwargs)
@@ -387,27 +359,22 @@ def animate(anim_objects, fps = 25, anim_save = None, bitrate = 1800,test=False,
 
 
 if __name__ == "__main__":
-    # test code
-    tlen = 100
-    x = np.arange(200)
-    y = np.arange(420)
-    X,Y,T = np.meshgrid(x,y,np.arange(tlen))
-    z = np.cos(np.pi*X/20)*np.sin(np.pi*Y/60)*np.cos(2*np.pi*T/50)
-    quad_object = create_quad_object(z,x=x,y=y)
-    
-    r = np.arange(0,2*np.pi,1e-1)
-    t = np.arange(0,4*np.pi,1e-1)
-    T,R = np.meshgrid(t,r)
-    s = np.cos(R - T)
-#    line_object = create_line_object(
-    scat = 2*np.ones((2,2))[:,:,np.newaxis]*np.arange(tlen)
-    x = np.arange(0, 200, 1)
-    [T,X] = np.meshgrid(np.arange(tlen),x)
-    y = 2*np.arange(tlen)*np.cos((X + T/tlen)/10)
-    #y = np.tile(np.arange(0,2,1e-1)[:,np.newaxis],(1,50))
-    #scatter_object = scatter_anim(scat,c='r',alpha = 0.5, s = 200, scatter_color = y)
-    #line_object = line_anim(x, y)
-    #Create the plot list
-    anim_list = [[quad_object], [quad_object]] #Each element is a subplot
+    # x-axis of plot
+    x = np.arange(0,2*np.pi,1e-1)
+   # time-axis of plot
+    t = np.arange(0,8*np.pi,1e-1)
 
-    animate(anim_list)
+    # Use meshgrid to create the data to be plotted
+    # (anim.plot can also accept 1D coordinate arrays) 
+    T,X = np.meshgrid(t,x)
+
+    # Create data - a propagating cosine wave
+    cos_wave = (t/t.max())*np.cos(X - T)
+
+    # Create a title for each frame
+    titles = ['Wave at time {:.02f}'.format(i) for i in t]
+    # Create the plot object
+    cos_line = plot(x, cos_wave, titles = titles)
+
+    # Animate the object
+    animate(cos_line,figsize=(10,7))
